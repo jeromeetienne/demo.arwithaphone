@@ -4,10 +4,10 @@
 <script src='vendor/three.js/examples/js/controls/OrbitControls.js'></script>
 
 <!-- include js-aruco -->
-<script src="../../src/svd.js"></script> 
-<script src="../../src/posit1.js"></script> 
-<script src="../../src/cv.js"></script> 
-<script src="../../src/aruco.js"></script> 
+<script src="vendor/js-aruco/svd.js"></script> 
+<script src="vendor/js-aruco/posit1.js"></script> 
+<script src="vendor/js-aruco/cv.js"></script> 
+<script src="vendor/js-aruco/aruco.js"></script> 
 
 <body style='margin: 0px; overflow: hidden; text-align:center;'><script>
 	//////////////////////////////////////////////////////////////////////////////////
@@ -17,8 +17,9 @@
 	// init renderer
 	var renderer	= new THREE.WebGLRenderer({
 		antialias	: true,
+		alpha: true,
 	});
-	renderer.setClearColor(new THREE.Color('lightgrey'), 1)
+	renderer.setClearColor(new THREE.Color('black'), 0)
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
 
@@ -36,11 +37,12 @@
 	//////////////////////////////////////////////////////////////////////////////////
 
 	// add a torus	
-	var geometry	= new THREE.TorusKnotGeometry(0.5-0.12, 0.12);
-	var material	= new THREE.MeshNormalMaterial(); 
-	var mesh	= new THREE.Mesh( geometry, material );
+	var geometry = new THREE.SphereGeometry(0.5, 15, 15, Math.PI)
+  var material = new THREE.MeshBasicMaterial( {
+		map: THREE.ImageUtils.loadTexture("images/earth.jpg")
+	})
+  var mesh = new THREE.Mesh(geometry, material);
 	scene.add( mesh );
-	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render the whole thing on the page
 	//////////////////////////////////////////////////////////////////////////////////
@@ -89,8 +91,9 @@
 	videoElement.style.position = 'absolute'
 	videoElement.style.top = '0px'
 	videoElement.style.left = '0px'
-	videoElement.style.width = '320px'
-	videoElement.style.height = '240px'
+	videoElement.style.width = '100%'
+	videoElement.style.height = '100%'
+	videoElement.style.zIndex = -1;
 
 
 	
@@ -144,24 +147,24 @@
 	})
 
 
-    function updateScenes(markers){
-      var corners, corner, pose, i;
-      
-      if (markers.length > 0){
-        corners = markers[0].corners;
-        console.dir(markers[0])
-        for (var i = 0; i < corners.length; ++ i){
-          corner = corners[i];
-          
-          corner.x = corner.x - (canvasElement.width / 2);
-          corner.y = (canvasElement.height / 2) - corner.y;
-        }
+  function updateScenes(markers){
+    var corners, corner, pose, i;
+    
+    if (markers.length > 0){
+      corners = markers[0].corners;
+      console.dir(markers[0])
+      for (var i = 0; i < corners.length; ++ i){
+        corner = corners[i];
         
-        var pose = posit.pose(corners);
-        
-        updateObject(mesh, pose.bestRotation, pose.bestTranslation);
+        corner.x = corner.x - (canvasElement.width / 2);
+        corner.y = (canvasElement.height / 2) - corner.y;
       }
-    };
+      
+      var pose = posit.pose(corners);
+      
+      updateObject(mesh, pose.bestRotation, pose.bestTranslation);
+    }
+  };
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Comments
 	//////////////////////////////////////////////////////////////////////////////////
@@ -200,17 +203,17 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Comments
 	//////////////////////////////////////////////////////////////////////////////////
-  function updateObject(object, rotation, translation){
-    object.scale.x = modelSize;
-    object.scale.y = modelSize;
-    object.scale.z = modelSize;
+  function updateObject(object3d, rotation, translation){
+    object3d.scale.x = modelSize;
+    object3d.scale.y = modelSize;
+    object3d.scale.z = modelSize;
     
-    object.rotation.x = -Math.asin(-rotation[1][2]);
-    object.rotation.y = -Math.atan2(rotation[0][2], rotation[2][2]);
-    object.rotation.z = Math.atan2(rotation[1][0], rotation[1][1]);
+    object3d.rotation.x = -Math.asin(-rotation[1][2]);
+    object3d.rotation.y = -Math.atan2(rotation[0][2], rotation[2][2]);
+    object3d.rotation.z = Math.atan2(rotation[1][0], rotation[1][1]);
 
-    object.position.x = translation[0];
-    object.position.y = translation[1];
-    object.position.z = -translation[2];
+    object3d.position.x = translation[0];
+    object3d.position.y = translation[1];
+    object3d.position.z = -translation[2];
   };
 </script></body>
