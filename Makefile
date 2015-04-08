@@ -3,9 +3,6 @@
 server:
 	python -m SimpleHTTPServer
 
-serverNginx:
-	nginx -s stop;nginx -p $$PWD -c ./nginx.conf
-
 deploy:
 	# assume there is something to commit
 	# use "git diff --exit-code HEAD" to know if there is something to commit
