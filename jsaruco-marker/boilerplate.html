@@ -43,6 +43,7 @@
 	})
   var mesh = new THREE.Mesh(geometry, material);
 	scene.add( mesh );
+	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render the whole thing on the page
 	//////////////////////////////////////////////////////////////////////////////////
@@ -115,10 +116,11 @@
 	var canvasElement = document.createElement('canvas')
 	canvasElement.width	= 320
 	canvasElement.height	= 240
-	document.body.appendChild(canvasElement)
+	// document.body.appendChild(canvasElement)
 	canvasElement.style.position = 'absolute'
-	canvasElement.style.bottom = '0px'
+	canvasElement.style.top = '0px'
 	canvasElement.style.left = '0px'
+	canvasElement.style.opacity = 0.2
 
 	var context = canvasElement.getContext("2d");
 
@@ -140,30 +142,28 @@
 		
 		// detect markers
 		var markers = detector.detect(imageData);
-		console.dir(markers)
-		drawCorners(markers)
+		// console.dir(markers)
+		// drawCorners(markers)
 		
 		updateScenes(markers)
 	})
 
 
   function updateScenes(markers){
-    var corners, corner, pose, i;
-    
-    if (markers.length > 0){
-      corners = markers[0].corners;
-      console.dir(markers[0])
-      for (var i = 0; i < corners.length; ++ i){
-        corner = corners[i];
-        
-        corner.x = corner.x - (canvasElement.width / 2);
-        corner.y = (canvasElement.height / 2) - corner.y;
-      }
-      
-      var pose = posit.pose(corners);
-      
-      updateObject(mesh, pose.bestRotation, pose.bestTranslation);
+    if (markers.length  ===  0) return
+		
+    var corners = markers[0].corners;
+		// convert corners
+    for (var i = 0; i < corners.length; ++ i){
+      var corner = corners[i];
+      corner.x = corner.x - (canvasElement.width / 2);
+      corner.y = (canvasElement.height / 2) - corner.y;
     }
+    
+    var pose = posit.pose(corners);
+		
+    // update mesh with post
+    updateObject(mesh, pose.bestRotation, pose.bestTranslation);
   };
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Comments
