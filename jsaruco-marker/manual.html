@@ -1,294 +1,215 @@
-<html>
+<!DOCTYPE html>
+<!-- include three.js -->
+<script src='vendor/three.js/build/three.js'></script>
 
-<head>
-  <title>Augmented Reality</title>
+<!-- include js-aruco -->
+<script src="vendor/js-aruco/svd.js"></script> 
+<script src="vendor/js-aruco/posit1.js"></script> 
+<script src="vendor/js-aruco/cv.js"></script> 
+<script src="vendor/js-aruco/aruco.js"></script> 
 
-  <script src='vendor/three.js/build/three.js'></script>
+<body style='margin: 0px; overflow: hidden; text-align:center;'><script>
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Init
+	//////////////////////////////////////////////////////////////////////////////////
 
-  <script type="text/javascript" src="../../src/svd.js"></script> 
-  <script type="text/javascript" src="../../src/posit1.js"></script> 
-  <script type="text/javascript" src="../../src/cv.js"></script> 
-  <script type="text/javascript" src="../../src/aruco.js"></script> 
+	// init renderer
+	var renderer	= new THREE.WebGLRenderer({
+		antialias	: true,
+		alpha: true,
+	});
+	renderer.setClearColor(new THREE.Color('black'), 0)
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
 
-  <script>
-    var video, canvas, context, imageData, detector, posit;
-    var renderer1, renderer2, renderer3;
-    var scene1, scene2, scene3, scene4;
-    var camera1, camera2, camera3, camera4;
-    var plane1, plane2, model, texture;
-    var step = 0.0;
+	// array of functions for the rendering loop
+	var onRenderFcts= [];
 
-    var modelSize = 35.0; //millimeters
+	// init scene and camera
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
+	camera.position.z = 2;
 
-    function onLoad(){
-      video = document.getElementById("video");
-      canvas = document.getElementById("canvas");
-      context = canvas.getContext("2d");
-    
-      canvas.width = parseInt(canvas.style.width);
-      canvas.height = parseInt(canvas.style.height);
-      
-      navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-      if (navigator.getUserMedia){
-        init();
-      }
-    };
-    
-    function init(){
-      navigator.getUserMedia({video:true}, 
-        function (stream){
-          if (window.webkitURL) {
-            video.src = window.webkitURL.createObjectURL(stream);
-          } else if (video.mozSrcObject !== undefined) {
-            video.mozSrcObject = stream;
-          } else {
-            video.src = stream;
-          }
-        },
-        function(error){
-        }
-      );
-      
-      detector = new AR.Detector();
-      posit = new POS.Posit(modelSize, canvas.width);
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object in the scene
+	//////////////////////////////////////////////////////////////////////////////////
 
-      createRenderers();
-      createScenes();
+	// add a torus	
+	var geometry = new THREE.SphereGeometry(0.5, 15, 15, Math.PI)
+  var material = new THREE.MeshBasicMaterial( {
+		map: THREE.ImageUtils.loadTexture("images/earth.jpg")
+	})
+  var mesh = new THREE.Mesh(geometry, material);
+	scene.add( mesh );
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the whole thing on the page
+	//////////////////////////////////////////////////////////////////////////////////
 
-      requestAnimationFrame(tick);
-    };
+	// handle window resize
+	window.addEventListener('resize', function(){
+		renderer.setSize( window.innerWidth, window.innerHeight )
+		camera.aspect	= window.innerWidth / window.innerHeight
+		camera.updateProjectionMatrix()		
+	}, false)
 
-    function tick(){
-      requestAnimationFrame(tick);
-      
-      if (video.readyState === video.HAVE_ENOUGH_DATA){
-        snapshot();
+	// render the scene
+	onRenderFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	// run the rendering loop
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		onRenderFcts.forEach(function(onRenderFct){
+			onRenderFct(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		shim party
+	//////////////////////////////////////////////////////////////////////////////////
+	
+  // shim
+  navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+  window.URL = window.URL || window.webkitURL;
 
-        var markers = detector.detect(imageData);
-        drawCorners(markers);
-        updateScenes(markers);
-        
-        render();
-      }
-    };
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Comments
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	var videoElement = document.createElement('video')
+	document.body.appendChild(videoElement)
+	videoElement.style.position = 'absolute'
+	videoElement.style.top = '0px'
+	videoElement.style.left = '0px'
+	videoElement.style.width = '100%'
+	videoElement.style.height = '100%'
+	videoElement.style.zIndex = -1;
 
-    function snapshot(){
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-    };
-    
-    function drawCorners(markers){
-      var corners, corner, i, j;
-    
-      context.lineWidth = 3;
 
-      for (i = 0; i < markers.length; ++ i){
-        corners = markers[i].corners;
-        
-        context.strokeStyle = "red";
-        context.beginPath();
-        
-        for (j = 0; j < corners.length; ++ j){
-          corner = corners[j];
-          context.moveTo(corner.x, corner.y);
-          corner = corners[(j + 1) % corners.length];
-          context.lineTo(corner.x, corner.y);
-        }
+	
+									
+	var constraints = {video:true}
+	navigator.getUserMedia(constraints, function (stream){
+		videoElement.src = URL.createObjectURL(stream);
+		videoElement.play();
+	}, function(error){
+    console.log("An error occured! ");
+    console.dir(error)
+	});
+	
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Comments
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	var canvasElement = document.createElement('canvas')
+	canvasElement.width	= 320
+	canvasElement.height	= 240
+	// document.body.appendChild(canvasElement)
+	canvasElement.style.position = 'absolute'
+	canvasElement.style.top = '0px'
+	canvasElement.style.left = '0px'
+	canvasElement.style.opacity = 0.2
 
-        context.stroke();
-        context.closePath();
-        
-        context.strokeStyle = "green";
-        context.strokeRect(corners[0].x - 2, corners[0].y - 2, 4, 4);
-      }
-    };
+	var context = canvasElement.getContext("2d");
 
-    function createRenderers(){
-      renderer1 = new THREE.WebGLRenderer({
-        antialias: true
-      });
-      renderer1.setClearColor(0xffff00, 1);
-      renderer1.setSize(canvas.width, canvas.height);
-      document.getElementById("container1").appendChild(renderer1.domElement);
-      scene1 = new THREE.Scene();
-      camera1 = new THREE.PerspectiveCamera(40, canvas.width / canvas.height, 1, 1000);
-      scene1.add(camera1);
-
-      renderer2 = new THREE.WebGLRenderer();
-      renderer2.setClearColor(0xffff00, 1);
-      renderer2.setSize(canvas.width, canvas.height);
-      document.getElementById("container2").appendChild(renderer2.domElement);
-      scene2 = new THREE.Scene();
-      camera2 = new THREE.PerspectiveCamera(40, canvas.width / canvas.height, 1, 1000);
-      scene2.add(camera2);
-
-      renderer3 = new THREE.WebGLRenderer();
-      renderer3.setClearColor(0xffffff, 1);
-      renderer3.setSize(canvas.width, canvas.height);
-      document.getElementById("container").appendChild(renderer3.domElement);
-      
-      scene3 = new THREE.Scene();
-      camera3 = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5);
-      scene3.add(camera3);
-      
-      scene4 = new THREE.Scene();
-      camera4 = new THREE.PerspectiveCamera(40, canvas.width / canvas.height, 1, 1000);
-      scene4.add(camera4);
-    };
-
-    function render(){
-      renderer1.clear();
-      renderer1.render(scene1, camera1);
-      
-      renderer2.clear();
-      renderer2.render(scene2, camera2);
-
-      renderer3.autoClear = false;
-      renderer3.clear();
-      renderer3.render(scene3, camera3);
-      renderer3.render(scene4, camera4);
-    };
-
-    function createScenes(){
-      plane1 = createPlane();
-      scene1.add(plane1);
-
-      plane2 = createPlane();
-      scene2.add(plane2);
-      
-      texture = createTexture();
-      scene3.add(texture);
-    
-      model = createModel();
-      scene4.add(model);
-    };
-    
-    function createPlane(){
-      var object = new THREE.Object3D(),
-          geometry = new THREE.PlaneGeometry(1.0, 1.0, 0.0),
-          material = new THREE.MeshNormalMaterial(),
-          mesh = new THREE.Mesh(geometry, material);
-      
-      object.add(mesh);
-      
-      return object;
-    };
-    
-    function createTexture(){
-      var texture = new THREE.Texture(video),
-          object = new THREE.Object3D(),
-          geometry = new THREE.PlaneGeometry(1.0, 1.0, 0.0),
-          material = new THREE.MeshBasicMaterial( {map: texture, depthTest: false, depthWrite: false} ),
-          mesh = new THREE.Mesh(geometry, material);
-      
-      object.position.z = -1;
-      
-      object.add(mesh);
-      
-      return object;
-    };
-    
-    function createModel(){
-      var object = new THREE.Object3D(),
-          geometry = new THREE.SphereGeometry(0.5, 15, 15, Math.PI),
-          texture = THREE.ImageUtils.loadTexture("textures/earth.jpg"),
-          material = new THREE.MeshBasicMaterial( {map: texture} ),
-          mesh = new THREE.Mesh(geometry, material);
-      
-      object.add(mesh);
-      
-      return object;
-    };
-
-    function updateScenes(markers){
-      var corners, corner, pose, i;
-      
-      if (markers.length > 0){
-        corners = markers[0].corners;
-        console.dir(markers[0])
-        for (i = 0; i < corners.length; ++ i){
-          corner = corners[i];
-          
-          corner.x = corner.x - (canvas.width / 2);
-          corner.y = (canvas.height / 2) - corner.y;
-        }
-        
-        pose = posit.pose(corners);
-        
-        updateObject(plane1, pose.bestRotation, pose.bestTranslation);
-        updateObject(plane2, pose.alternativeRotation, pose.alternativeTranslation);
-        updateObject(model, pose.bestRotation, pose.bestTranslation);
-
-        updatePose("pose1", pose.bestError, pose.bestRotation, pose.bestTranslation);
-        updatePose("pose2", pose.alternativeError, pose.alternativeRotation, pose.alternativeTranslation);
-        
-        step += 0.025;
-        
-        // model.rotation.z -= step;
-      }
-      
-      texture.children[0].material.map.needsUpdate = true;
-    };
-    
-    function updateObject(object, rotation, translation){
-      object.scale.x = modelSize;
-      object.scale.y = modelSize;
-      object.scale.z = modelSize;
-      
-      object.rotation.x = -Math.asin(-rotation[1][2]);
-      object.rotation.y = -Math.atan2(rotation[0][2], rotation[2][2]);
-      object.rotation.z = Math.atan2(rotation[1][0], rotation[1][1]);
-
-      object.position.x = translation[0];
-      object.position.y = translation[1];
-      object.position.z = -translation[2];
-    };
-    
-    function updatePose(id, error, rotation, translation){
-      var yaw = -Math.atan2(rotation[0][2], rotation[2][2]);
-      var pitch = -Math.asin(-rotation[1][2]);
-      var roll = Math.atan2(rotation[1][0], rotation[1][1]);
-      
-      var d = document.getElementById(id);
-      d.innerHTML = " error: " + error
-                  + "<br/>"
-                  + " x: " + (translation[0] | 0)
-                  + " y: " + (translation[1] | 0)
-                  + " z: " + (translation[2] | 0)
-                  + "<br/>"
-                  + " yaw: " + Math.round(-yaw * 180.0/Math.PI)
-                  + " pitch: " + Math.round(-pitch * 180.0/Math.PI)
-                  + " roll: " + Math.round(roll * 180.0/Math.PI);
-    };
-
-    window.onload = onLoad;
-  </script>
-
-</head>
-
-<body style="text-align: center; font-family: monospace;">
-
-  <video id="video" width=320 height=240 autoplay="true" style="display:none;"></video>
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Comments
+	//////////////////////////////////////////////////////////////////////////////////
   
-  <div style="margin: 10px;"><strong>-= Augmented Reality =-</strong></div>
-  <div style="width: 100%;">
-    <div style="width: 650px; margin-left:auto; margin-right:auto;">
-      <canvas id="canvas" style="width: 320px; height: 240px; float: left; border: solid 1px black;"></canvas>
-      <div id="container" style="width: 320px; height: 240px; float: left; border: solid 1px black; background: green;"></div>
-      <div style="clear: both;"></div>
-      <div style="float: left; border: solid 1px black;">
-        <div id="container1" style="width: 320px; height: 240px; background: red;"></div>
-        <div id="pose1"></div>
-      </div>
-      <div style="float: left; border: solid 1px black;">
-        <div id="container2" style="width: 320px; height: 240px; background: blue;"></div>
-        <div id="pose2"></div>
-      </div>
-    </div>
-  </div>
-  <div style="clear: both;"></div>
-  <div style="margin: 15px;"><strong>Powered by <a href="http://code.google.com/p/js-aruco/">js-aruco</a> and <a href="https://github.com/mrdoob/three.js">Three.js</a></strong></div>
+	var detector = new AR.Detector();
+	var modelSize = 35.0; // millimeter
+  var posit = new POS.Posit(modelSize, canvasElement.width);
+	
+	onRenderFcts.push(function(){
+		// if no new image for videoElement do nothing
+    if (videoElement.readyState !== videoElement.HAVE_ENOUGH_DATA) return
 
-</body>
+		// get imageData from videoElement
+  	context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+  	var imageData = context.getImageData(0, 0, canvasElement.width, canvasElement.height);
+		
+		// detect markers
+		var markers = detector.detect(imageData);
+		// display markers on canvas for debug
+		// drawCorners(canvasElement, markers)
+			
+		// if no marker got detected
+    if (markers.length  ===  0) return
+		
+    var corners = markers[0].corners;
+		// convert corners coordinate - not sure why
+    for (var i = 0; i < corners.length; ++ i){
+      var corner = corners[i];
+      corner.x = corner.x - (canvasElement.width / 2);
+      corner.y = (canvasElement.height / 2) - corner.y;
+    }
+
+    // determine the pose
+    var pose = posit.pose(corners);
+		
+    // update mesh with post
+    updateObject(mesh, pose.bestRotation, pose.bestTranslation);
+  };
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Comments
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	/**
+	 * draw corners on a canvas - useful to debug
+	 * 
+	 * @param {Object[]} markers - array of found markers
+	 */
+  function drawCorners(markers, canvasElement){
+		var context = canvasElement.getContext("2d");
+    var corners, corner, i, j;
   
-</html>
+    context.lineWidth = 3;
+
+    for (i = 0; i < markers.length; ++ i){
+      corners = markers[i].corners;
+      
+      context.strokeStyle = "red";
+      context.beginPath();
+      
+      for (j = 0; j < corners.length; ++ j){
+        corner = corners[j];
+        context.moveTo(corner.x, corner.y);
+        corner = corners[(j + 1) % corners.length];
+        context.lineTo(corner.x, corner.y);
+      }
+
+      context.stroke();
+      context.closePath();
+      
+      context.strokeStyle = "green";
+      context.strokeRect(corners[0].x - 2, corners[0].y - 2, 4, 4);
+    }
+  };
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Comments
+	//////////////////////////////////////////////////////////////////////////////////
+  function updateObject(object3d, rotation, translation){
+    object3d.scale.x = modelSize;
+    object3d.scale.y = modelSize;
+    object3d.scale.z = modelSize;
+    
+    object3d.rotation.x = -Math.asin(-rotation[1][2]);
+    object3d.rotation.y = -Math.atan2(rotation[0][2], rotation[2][2]);
+    object3d.rotation.z = Math.atan2(rotation[1][0], rotation[1][1]);
+
+    object3d.position.x = translation[0];
+    object3d.position.y = translation[1];
+    object3d.position.z = -translation[2];
+  };
+</script></body>
