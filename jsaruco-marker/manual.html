@@ -33,13 +33,13 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	//		add an object in the scene
 	//////////////////////////////////////////////////////////////////////////////////
-
+	
 	// add a torus	
 	var geometry = new THREE.SphereGeometry(0.5, 15, 15, Math.PI)
-  var material = new THREE.MeshBasicMaterial( {
+	var material = new THREE.MeshBasicMaterial( {
 		map: THREE.ImageUtils.loadTexture("images/earth.jpg")
 	})
-  var mesh = new THREE.Mesh(geometry, material);
+	var mesh = new THREE.Mesh(geometry, material);
 	scene.add( mesh );
 	
 	//////////////////////////////////////////////////////////////////////////////////
