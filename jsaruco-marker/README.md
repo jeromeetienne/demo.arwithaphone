@@ -1,3 +1,15 @@
+# idea
+- i redo this demo http://youtu.be/9XmKbn8ccY8
+- And there is even a Japanese guy who got the dancing girl
+  - here is the dancing girl https://twitter.com/LearningThreejs/status/585057618814697472
+  - ask for permission
+  
+# possible performance improvement js-aruco
+- ability to average multiple pose to be more robust to error
+- ability to run in webworker to have a more fluid detection
+- better handle the error case
+  - 
+
 # NOTE js-aruco + three.js
 - possible to locate the marker in the video stream
 - what can we do with that ?
