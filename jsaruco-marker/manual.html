@@ -26,20 +26,32 @@
 	var onRenderFcts= [];
 
 	// init scene and camera
-	var scene	= new THREE.Scene();
+	var scene = new THREE.Scene()
+
+		
 	var camera	= new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.01, 1000);
 	camera.position.z = 2;
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		add an object in the scene
 	//////////////////////////////////////////////////////////////////////////////////
+
 	
-	// add a torus	
-	var geometry = new THREE.SphereGeometry(0.5, 15, 15, Math.PI)
-	var material = new THREE.MeshBasicMaterial( {
-		map: THREE.ImageUtils.loadTexture("images/earth.jpg")
-	})
-	var mesh = new THREE.Mesh(geometry, material);
+	;(function(){
+		// add a torus	
+		var geometry = new THREE.SphereGeometry(0.5, 32, 16, Math.PI)
+		var material = new THREE.MeshBasicMaterial( {
+			map: THREE.ImageUtils.loadTexture("images/earth.jpg")
+		})
+		var mesh = new THREE.Mesh(geometry, material);
+		scene.add( mesh );
+		// mesh.rotation.z = Math.PI/2
+		onRenderFcts.push(function(delta){
+			mesh.rotation.y += 0.1 * delta * Math.PI
+		})		
+	})()
+	
+	var mesh = new THREE.AxisHelper
 	scene.add( mesh );
 	
 	//////////////////////////////////////////////////////////////////////////////////
@@ -53,9 +65,14 @@
 		camera.updateProjectionMatrix()		
 	}, false)
 
-	// render the scene
+
+	// build sceneAR
+	var sceneAR	= new THREE.Scene();
+	sceneAR.add(scene)
+
+	// render the sceneAR
 	onRenderFcts.push(function(){
-		renderer.render( scene, camera );		
+		renderer.render( sceneAR, camera );		
 	})
 	
 	// run the rendering loop
@@ -207,10 +224,10 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	var canvasElement = document.createElement('canvas')
-	canvasElement.width	= 320
-	canvasElement.height	= 240
-	canvasElement.width	= 320*2
-	canvasElement.height	= 240*2
+	// canvasElement.width	= 320
+	// canvasElement.height	= 240
+	// canvasElement.width	= 320*2
+	// canvasElement.height	= 240*2
 	document.body.appendChild(canvasElement)
 	canvasElement.style.position = 'absolute'
 	canvasElement.style.top = '0px'
@@ -230,14 +247,12 @@
 		if (videoElement.readyState !== videoElement.HAVE_ENOUGH_DATA) return
 
 		canvasElement.width	= videoElement.videoWidth/2
-		canvasElement.height	= videoElement.videoHeight/2
+		canvasElement.height = videoElement.videoHeight/2
 
 		// get imageData from videoElement
 		context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
 		var imageData = context.getImageData(0, 0, canvasElement.width, canvasElement.height);
 		
-		
-
 		// detect markers
 		var detector = new AR.Detector();
 		var markers = detector.detect(imageData);
@@ -245,7 +260,7 @@
 		// display markers on canvas for debug
 		drawCorners(markers, canvasElement)
 		
-		mesh.visible = false
+		scene.visible = false
 		
 		// if no marker got detected
 		if (markers.length  ===  0) return
@@ -255,8 +270,8 @@
 		if( marker.id === 265 ){
 			var pose = markerToPose(marker)
 			if( pose !== null ){
-				poseToObject(pose, mesh);			
-				mesh.visible = true				
+				poseToObject(pose, scene);
+				scene.visible = true				
 			}		
 		}
 	});
@@ -274,15 +289,14 @@
 		
 		object3d.rotation.x = -Math.asin(-rotation[1][2]);
 		object3d.rotation.y = -Math.atan2(rotation[0][2], rotation[2][2]);
-		object3d.rotation.z = Math.atan2(rotation[1][0], rotation[1][1]);
+		object3d.rotation.z =  Math.atan2(rotation[1][0], rotation[1][1]);
 		
-		object3d.position.x = translation[0];
-		object3d.position.y = translation[1];
-		object3d.position.z = -translation[2];		
+		object3d.position.x =  translation[0];
+		object3d.position.y =  translation[1];
+		object3d.position.z = -translation[2];
 	}
 	
 	function markerToPose(marker){
-		
 		// convert corners coordinate - not sure why
 		var corners = []//marker.corners;
 		for (var i = 0; i < marker.corners.length; ++ i){

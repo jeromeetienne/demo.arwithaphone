@@ -2,7 +2,13 @@
 - i redo this demo http://youtu.be/9XmKbn8ccY8
 - And there is even a Japanese guy who got the dancing girl
   - here is the dancing girl https://twitter.com/LearningThreejs/status/585057618814697472
-  - ask for permission
+  - ask for permission. permission seems kinda ok but the code is a bore to use
+  - find another story
+
+# How to express the result of a pose ?
+- the marker[s] represents the center of the scene
+- we should not move the scene, we should move the camera
+- currently the code is moving the scene.
   
 # possible performance improvement js-aruco
 - ability to average multiple pose to be more robust to error
