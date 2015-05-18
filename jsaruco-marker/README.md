@@ -2,19 +2,19 @@
 - i redo this demo http://youtu.be/9XmKbn8ccY8
 - And there is even a Japanese guy who got the dancing girl
   - here is the dancing girl https://twitter.com/LearningThreejs/status/585057618814697472
-  - ask for permission. permission seems kinda ok but the code is a bore to use
-  - find another story
+  - he got a three.js version
+  - use this one - git@github.com:jeromeetienne/demo.arwithaphone.git
 
 # How to express the result of a pose ?
 - the marker[s] represents the center of the scene
 - we should not move the scene, we should move the camera
 - currently the code is moving the scene.
-  
+
 # possible performance improvement js-aruco
 - ability to average multiple pose to be more robust to error
 - ability to run in webworker to have a more fluid detection
 - better handle the error case
-  - 
+  -
 
 # NOTE js-aruco + three.js
 - possible to locate the marker in the video stream

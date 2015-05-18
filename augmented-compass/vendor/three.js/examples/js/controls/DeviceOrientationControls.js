@@ -36,7 +36,6 @@ THREE.DeviceOrientationControls = function ( object ) {
 		return function () {
 
 			if ( this.freeze ) return;
-
 			alpha  = this.deviceOrientation.gamma ? THREE.Math.degToRad( this.deviceOrientation.alpha ) : 0; // Z
 			beta   = this.deviceOrientation.beta  ? THREE.Math.degToRad( this.deviceOrientation.beta  ) : 0; // X'
 			gamma  = this.deviceOrientation.gamma ? THREE.Math.degToRad( this.deviceOrientation.gamma ) : 0; // Y''
