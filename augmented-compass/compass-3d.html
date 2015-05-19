@@ -31,11 +31,11 @@
 	//		add an object in the scene
 	//////////////////////////////////////////////////////////////////////////////////
 
-	// add a torus
-	var geometry	= new THREE.TorusKnotGeometry(0.5-0.12, 0.12);
-	var material	= new THREE.MeshNormalMaterial();
-	var mesh	= new THREE.Mesh( geometry, material );
-	scene.add( mesh );
+	// // add a torus
+	// var geometry	= new THREE.TorusKnotGeometry(0.5-0.12, 0.12);
+	// var material	= new THREE.MeshNormalMaterial();
+	// var mesh	= new THREE.Mesh( geometry, material );
+	// scene.add( mesh );
 
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -70,8 +70,8 @@
 	// display a nicer compass
 	var radiusLarge	= 2
 	var largeArrowGeometry	= new THREE.CylinderGeometry(0, 0.5, radiusLarge, 4);
-	var radiusSmall	= 4
-	var smallArrowGeometry	= new THREE.CylinderGeometry(0, 0.5, radiusSmall, 4);
+	var radiusSmall	= 1.5
+	var smallArrowGeometry	= new THREE.CylinderGeometry(0, 0.3, radiusSmall, 4);
 
 	// Large Arrow North
 	var material	= new THREE.MeshPhongMaterial({
@@ -83,7 +83,7 @@
 
 	// Large Arrow South
 	var material	= new THREE.MeshPhongMaterial({
-		color	: 'white'
+		color	: 'cyan'
 	});
 	var object3d	= new THREE.Mesh( largeArrowGeometry, material );
 	object3d.position.y	-= radiusLarge/2
@@ -93,7 +93,7 @@
 
 	// Large Arrow East
 	var material	= new THREE.MeshPhongMaterial({
-		color	: 'blue'
+		color	: 'cyan'
 	});
 	var object3d	= new THREE.Mesh( largeArrowGeometry, material );
 	object3d.position.x	+= radiusLarge/2
@@ -102,7 +102,7 @@
 
 	// Large Arrow West
 	var material	= new THREE.MeshPhongMaterial({
-		color	: 'blue'
+		color	: 'cyan'
 	});
 	var object3d	= new THREE.Mesh( largeArrowGeometry, material );
 	object3d.position.x	-= radiusLarge/2
@@ -110,10 +110,9 @@
 	compassContainer.add( object3d );
 
 	//////////////////////////////////////////////////////////////////////////////////
-	//		Small Star
+	//		Ring
 	//////////////////////////////////////////////////////////////////////////////////
 
-	// THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
 	var geometry	= new THREE.TorusGeometry(1.2, 0.1, 32, 32)
 	var material	= new THREE.MeshPhongMaterial({
 		color	: 'gold'
@@ -121,6 +120,52 @@
 	var object3d	= new THREE.Mesh( geometry, material );
 	object3d.scale.z= 0.5
 	compassContainer.add( object3d );
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Small Star
+	//////////////////////////////////////////////////////////////////////////////////
+
+	// Large Arrow North-West
+	var material	= new THREE.MeshPhongMaterial({
+		color	: 'gold'
+	});
+	var object3d	= new THREE.Mesh( smallArrowGeometry, material );
+	object3d.rotation.z	=  Math.PI/4
+	object3d.position.x	= -Math.cos(object3d.rotation.z) * radiusSmall/2
+	object3d.position.y	=  Math.sin(object3d.rotation.z) * radiusSmall/2
+	compassContainer.add( object3d );
+
+	// Large Arrow North-East
+	var material	= new THREE.MeshPhongMaterial({
+		color	: 'gold'
+	});
+	var object3d	= new THREE.Mesh( smallArrowGeometry, material );
+	object3d.rotation.z	= -Math.PI/4
+	object3d.position.x	=  Math.cos(object3d.rotation.z) * radiusSmall/2
+	object3d.position.y	= -Math.sin(object3d.rotation.z) * radiusSmall/2
+	compassContainer.add( object3d );
+
+	// Large Arrow South-West
+	var material	= new THREE.MeshPhongMaterial({
+		color	: 'gold'
+	});
+	var object3d	= new THREE.Mesh( smallArrowGeometry, material );
+	object3d.rotation.z	= 3*Math.PI/4
+	object3d.position.x	=  Math.cos(object3d.rotation.z) * radiusSmall/2
+	object3d.position.y	= -Math.sin(object3d.rotation.z) * radiusSmall/2
+	compassContainer.add( object3d );
+
+	// Large Arrow South-East
+	var material	= new THREE.MeshPhongMaterial({
+		color	: 'gold'
+	});
+	var object3d	= new THREE.Mesh( smallArrowGeometry, material );
+	object3d.rotation.z	= -3*Math.PI/4
+	object3d.position.x	= -Math.cos(object3d.rotation.z) * radiusSmall/2
+	object3d.position.y	=  Math.sin(object3d.rotation.z) * radiusSmall/2
+	compassContainer.add( object3d );
+
 })()
 
 	//////////////////////////////////////////////////////////////////////////////////
