@@ -31,9 +31,9 @@ window.addEventListener('load', function(){
 	// init scene and camera
 	var scene	= new THREE.Scene();
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
-	camera.position.y =  1
-	// camera.position.setLength(3)
-
+	camera.position.z = 8
+        camera.position.y = 2
+window.camera = camera
 	//////////////////////////////////////////////////////////////////////////////////
 	//		set 3 point lighting						//
 	//////////////////////////////////////////////////////////////////////////////////
@@ -68,12 +68,12 @@ window.addEventListener('load', function(){
 	function onDeviceOrientation(event){
 		// be sure this is a valid deviceorientation event
 		if( !event.alpha )	return;
-
 		// disable the THREE.OrbitControls
 		controls.enabled	= false
 
 		// setup the DeviceOrientationControls
 		controls = new THREE.DeviceOrientationControls(camera);
+		// controls = new THREE.DeviceOrientationControls(compassMesh);
 		controls.connect();
 
 		// stop listening on deviceorientation
@@ -85,46 +85,32 @@ window.addEventListener('load', function(){
 		controls.update()
 	})
 
-
-        //////////////////////////////////////////////////////////////////////////////////
-        //                Add the compass in the middle
-        //////////////////////////////////////////////////////////////////////////////////
-        ;(function(){
-		var texture	= THREE.ImageUtils.loadTexture('images/1657423_orig.png')
-		// texture.anisotropy	= renderer
-
-                var geometry    = new THREE.CircleGeometry(1, 32)
-                var material    = new THREE.MeshBasicMaterial({
-			// map 	: THREE.ImageUtils.loadTexture( '../images/checker.png' ),
-			side	: THREE.DoubleSide,
-			map 	: texture,
-			opacity	: 0.5,
-			transparent: true,
-		})
-                var mesh        = new THREE.Mesh(geometry, material)
-		mesh.scale.multiplyScalar(10)
-		// mesh.position.y	= -1
-		mesh.rotation.x	= -Math.PI/2
-		// mesh.rotation.z += Math.PI/4
-		// mesh.lookAt(new THREE.Vector3(0,1,0))
-                scene.add(mesh)
-		window.scene	= scene
-        })()
-
 	//////////////////////////////////////////////////////////////////////////////////
 	//		compass in 3d
 	//////////////////////////////////////////////////////////////////////////////////
 ;(function(){
+
+// return
+var compassMesh	= new THREE.Object3D()
+
+scene.add(compassMesh)
+window.compassMesh = compassMesh
+
 	var compassContainer	= new THREE.Object3D()
 	compassContainer.scale.z= 0.5
-	scene.add(compassContainer)
+	compassContainer.rotation.x = Math.PI/2
+	compassMesh.add(compassContainer)
+	// scene.add(compassContainer)
+
+
 
 	// display a nicer compass
 	var radiusLarge	= 2
 	var largeArrowGeometry	= new THREE.CylinderGeometry(0, 0.5, radiusLarge, 4);
+	var radiusSmall	= 1.5
+	var smallArrowGeometry	= new THREE.CylinderGeometry(0, 0.3, radiusSmall, 4);
 
 	// Large Arrow North
-	var geometry	= new THREE.CylinderGeometry(0, 0.5, radiusLarge, 4);
 	var material	= new THREE.MeshPhongMaterial({
 		color	: 'red'
 	});
@@ -133,9 +119,8 @@ window.addEventListener('load', function(){
 	compassContainer.add( object3d );
 
 	// Large Arrow South
-	var geometry	= new THREE.CylinderGeometry(0, 0.5, radiusLarge, 4);
 	var material	= new THREE.MeshPhongMaterial({
-		color	: 'white'
+		color	: 'cyan'
 	});
 	var object3d	= new THREE.Mesh( largeArrowGeometry, material );
 	object3d.position.y	-= radiusLarge/2
@@ -144,27 +129,81 @@ window.addEventListener('load', function(){
 
 
 	// Large Arrow East
-	var geometry	= new THREE.CylinderGeometry(0, 0.5, radiusLarge, 4);
 	var material	= new THREE.MeshPhongMaterial({
-		color	: 'blue'
+		color	: 'cyan'
 	});
 	var object3d	= new THREE.Mesh( largeArrowGeometry, material );
 	object3d.position.x	+= radiusLarge/2
 	object3d.rotation.z	= -Math.PI/2
 	compassContainer.add( object3d );
 
-
 	// Large Arrow West
-	var geometry	= new THREE.CylinderGeometry(0, 0.5, radiusLarge, 4);
 	var material	= new THREE.MeshPhongMaterial({
-		color	: 'blue'
+		color	: 'cyan'
 	});
 	var object3d	= new THREE.Mesh( largeArrowGeometry, material );
 	object3d.position.x	-= radiusLarge/2
 	object3d.rotation.z	= +Math.PI/2
 	compassContainer.add( object3d );
-})()
 
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Ring
+	//////////////////////////////////////////////////////////////////////////////////
+
+	var geometry	= new THREE.TorusGeometry(1.2, 0.1, 32, 32)
+	var material	= new THREE.MeshPhongMaterial({
+		color	: 'gold'
+	});
+	var object3d	= new THREE.Mesh( geometry, material );
+	object3d.scale.z= 0.5
+	compassContainer.add( object3d );
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Small Star
+	//////////////////////////////////////////////////////////////////////////////////
+
+	// Large Arrow North-West
+	var material	= new THREE.MeshPhongMaterial({
+		color	: 'gold'
+	});
+	var object3d	= new THREE.Mesh( smallArrowGeometry, material );
+	object3d.rotation.z	=  Math.PI/4
+	object3d.position.x	= -Math.cos(object3d.rotation.z) * radiusSmall/2
+	object3d.position.y	=  Math.sin(object3d.rotation.z) * radiusSmall/2
+	compassContainer.add( object3d );
+
+	// Large Arrow North-East
+	var material	= new THREE.MeshPhongMaterial({
+		color	: 'gold'
+	});
+	var object3d	= new THREE.Mesh( smallArrowGeometry, material );
+	object3d.rotation.z	= -Math.PI/4
+	object3d.position.x	=  Math.cos(object3d.rotation.z) * radiusSmall/2
+	object3d.position.y	= -Math.sin(object3d.rotation.z) * radiusSmall/2
+	compassContainer.add( object3d );
+
+	// Large Arrow South-West
+	var material	= new THREE.MeshPhongMaterial({
+		color	: 'gold'
+	});
+	var object3d	= new THREE.Mesh( smallArrowGeometry, material );
+	object3d.rotation.z	= 3*Math.PI/4
+	object3d.position.x	=  Math.cos(object3d.rotation.z) * radiusSmall/2
+	object3d.position.y	= -Math.sin(object3d.rotation.z) * radiusSmall/2
+	compassContainer.add( object3d );
+
+	// Large Arrow South-East
+	var material	= new THREE.MeshPhongMaterial({
+		color	: 'gold'
+	});
+	var object3d	= new THREE.Mesh( smallArrowGeometry, material );
+	object3d.rotation.z	= -3*Math.PI/4
+	object3d.position.x	= -Math.cos(object3d.rotation.z) * radiusSmall/2
+	object3d.position.y	=  Math.sin(object3d.rotation.z) * radiusSmall/2
+	compassContainer.add( object3d );
+
+})()
 	//////////////////////////////////////////////////////////////////////////////////
 	//		StereoEffect
 	//////////////////////////////////////////////////////////////////////////////////
