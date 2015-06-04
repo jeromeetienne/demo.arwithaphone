@@ -68,27 +68,12 @@
 	})()
 
 
-	;(function(){
-return
-		// add a torus
-		var geometry = new THREE.SphereGeometry(0.5, 32, 16, Math.PI)
-		var material = new THREE.MeshBasicMaterial( {
-			map: THREE.ImageUtils.loadTexture("images/earth.jpg")
-		})
-		var mesh = new THREE.Mesh(geometry, material);
-		scene.add( mesh );
-		// mesh.rotation.z = Math.PI/2
-		onRenderFcts.push(function(delta){
-			mesh.rotation.y += 0.1 * delta * Math.PI
-		})
-	})()
-
 	var mesh = new THREE.AxisHelper
 	scene.add( mesh );
 
 
 	//////////////////////////////////////////////////////////////////////////////////
-	//		add an object in the scene
+	//		Load and start hatsune miku
 	//////////////////////////////////////////////////////////////////////////////////
 	;(function(){
 		// model
@@ -108,7 +93,7 @@ return
 		var loader = new THREE.MMDLoader();
 		loader.load( 'models/miku/miku_v2.pmd', 'models/miku/wavefile_v2.vmd', function ( object3d ) {
 
-			object3d.scale.set(1,1,1).multiplyScalar(1/10)
+			object3d.scale.set(1,1,1).multiplyScalar(1/20)
 			object3d.rotation.x = Math.PI/2
 
 			scene.add( object3d );
