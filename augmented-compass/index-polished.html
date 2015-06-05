@@ -4,6 +4,7 @@
 <script src='vendor/three.js/examples/js/controls/OrbitControls.js'></script>
 <script src='vendor/three.js/examples/js/controls/PointerLockControls.js'></script>
 <script src='vendor/three.js/examples/js/controls/DeviceOrientationControls.js'></script>
+<script src='vendor/three.js/examples/js/controls/DeviceOrientationControls2.js'></script>
 <style>
 body, html {
         height : 100%;
@@ -66,13 +67,15 @@ window.camera = camera
 	controls.target.copy(scene.position)
 
 	function onDeviceOrientation(event){
+
 		// be sure this is a valid deviceorientation event
 		if( !event.alpha )	return;
 		// disable the THREE.OrbitControls
 		controls.enabled	= false
 
 		// setup the DeviceOrientationControls
-		controls = new THREE.DeviceOrientationControls(camera);
+		// controls = new THREE.DeviceOrientationControls(camera);
+		controls = new THREE.DeviceOrientationControls2(compassMesh, camera);
 		// controls = new THREE.DeviceOrientationControls(compassMesh);
 		controls.connect();
 

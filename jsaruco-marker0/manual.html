@@ -206,6 +206,9 @@
 	videoElement.style.height = '100%'
 	videoElement.style.zIndex = -1;
 
+
+
+
 	var constraints = {video:true}
 	navigator.getUserMedia(constraints, function (stream){
 		videoElement.src = URL.createObjectURL(stream);
