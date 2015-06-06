@@ -68,9 +68,13 @@
 		camera.updateProjectionMatrix()
 	}, false)
 
+	// build sceneAR
+	var sceneAR	= new THREE.Scene();
+	sceneAR.add(scene)
+
 	// render the scene
 	onRenderFcts.push(function(){
-		renderer.render( scene, camera );
+		renderer.render( sceneAR, camera );
 	})
 
 	// run the rendering loop
@@ -98,9 +102,9 @@
 	//		Comments
 	//////////////////////////////////////////////////////////////////////////////////
 
-	var jsArucoMarker	= new THREEx.jsArucoMarker()
+	var jsArucoMarker	= new THREEx.JsArucoMarker()
 	onRenderFcts.push(function(){
-		var videoElement	= VideoGrabbing.domElement
+		var videoElement	= videoGrabbing.domElement
 		jsArucoMarker.update(videoElement, scene)
 	});
 

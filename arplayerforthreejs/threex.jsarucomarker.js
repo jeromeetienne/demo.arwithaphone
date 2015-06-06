@@ -3,7 +3,7 @@ var THREEx = THREEx || {}
  * Grab camera
  */
 THREEx.JsArucoMarker = function(){
-
+	var jsArucoMarker = this
 	this.markerId	= 265
 	this.debugEnabled = true
 	var modelSize = 35.0; // millimeter
@@ -44,7 +44,7 @@ THREEx.JsArucoMarker = function(){
 
 		// see if this.markerId has been found
 		markers.forEach(function(marker){
-			if( marker.id !== this.markerId )	return
+			if( marker.id !== jsArucoMarker.markerId )	return
 
 			// move the object3d
 			var pose = markerToPose(marker)

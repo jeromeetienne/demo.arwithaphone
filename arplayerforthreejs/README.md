@@ -1,5 +1,11 @@
-# Js-aruco Marker
-- examples of jsaruco processing
+# Augmented Reality Player For Three.js
+
+# Example apps for the Hackathon
+- this is a 'ar player for three.js'
+- run the apps on a phone or on a desktop (run on nexus 6)
+- when a marker is reconized, take its id
+- display the three.js scene of this id
+- this scene is to be edited by the three.js editor
 
 # How To Design The Example
 - display the jsaruco output or not
@@ -53,8 +59,25 @@
 - no need to. just split the code in a nice fashion
 
 
+---
 
+-
 
+# Demo of the example apps
+- Describe a process to follow
+  - Similar to industrial steps but funnier
+  - e.g. a recipe in the kitchen
+- How to leave the office
+- Limit shaking by not using rotation. only position/scale
+
+# Video of the apps
+- put marker all over the appartements
+- the marker near the microwave
+  - popup the microwave scene
+  - display intro
+  - then menu : info/how to cook eggs/how to cook pasta/
+- interactive + contextual + spatialized
+- cool sounds when it pops up
 
 
 
