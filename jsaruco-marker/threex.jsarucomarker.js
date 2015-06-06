@@ -5,17 +5,20 @@ var THREEx = THREEx || {}
 THREEx.JsArucoMarker = function(){
 
 	this.markerId	= 265
+	this.debugEnabled = true
+	var modelSize = 35.0; // millimeter
 
 	var canvasElement = document.createElement('canvas')
-	document.body.appendChild(canvasElement)
-	canvasElement.style.position = 'absolute'
-	canvasElement.style.top = '0px'
-	canvasElement.style.left = '0px'
-	canvasElement.style.opacity = 0.2
-
 	var context = canvasElement.getContext("2d");
 
-	var modelSize = 35.0; // millimeter
+	if( this.debugEnabled ){
+		document.body.appendChild(canvasElement)
+		canvasElement.style.position = 'absolute'
+		canvasElement.style.top = '0px'
+		canvasElement.style.left = '0px'
+		canvasElement.style.opacity = 0.2
+	}
+
 
 	this.update	= function(videoElement, object3d){
 		// if no new image for videoElement do nothing
@@ -33,21 +36,22 @@ THREEx.JsArucoMarker = function(){
 		var markers = detector.detect(imageData);
 
 		// display markers on canvas for debug
-		drawCorners(markers, canvasElement)
+		if( this.debugEnabled ){
+			drawDebug(markers, canvasElement)
+		}
 
 		object3d.visible = false
 
-		// if no marker got detected
-		if (markers.length  ===  0) return
+		// see if this.markerId has been found
+		markers.forEach(function(marker){
+			if( marker.id !== this.markerId )	return
 
-		var marker = markers[0]
-
-		if( marker.id === this.markerId ){
+			// move the object3d
 			var pose = markerToPose(marker)
 			console.assert(pose !== null)
 			poseJsarucoToObject3D(pose, object3d);
 			object3d.visible = true
-		}
+		})
 	}
 
 	return
@@ -96,7 +100,7 @@ THREEx.JsArucoMarker = function(){
 	*
 	* @param {Object[]} markers - array of found markers
 	*/
-	function drawCorners(markers, canvasElement){
+	function drawDebug(markers, canvasElement){
 		var context = canvasElement.getContext("2d");
 		context.lineWidth = 3;
 
